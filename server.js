@@ -8,7 +8,6 @@ const morgan = require("morgan");
 const moment = require("moment");
 const { testDatabaseConnection, syncDatabase } = require("./src/config/db");
 const errorMiddleware = require("./src/middlewares/errorMiddleware");
-const ErrorHandler = require("./src/utilities/ErrorHandler");
 
 dotenv.config();
 
