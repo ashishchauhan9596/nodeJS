@@ -43,27 +43,27 @@ module.exports = (sequelize, Sequelize) => {
           fields: ["uniqueId"],
         },
       ],
-      hooks: {
-        // Hook to ensure email uniqueness before updates
-        beforeUpdate: async (user, options) => {
-          try {
-            // Ensure the email is unique when it's updated (excluding the current user)
-            const existingUserWithEmail = await sequelize.models.User.findOne({
-              where: { email: user.email, id: { [Sequelize.Op.ne]: user.id } },
-            });
-            if (existingUserWithEmail) {
-              return next(new ErrorHandler("Email is already in use.", 409)); // Use next() to pass error
-            }
-          } catch (error) {
-            return next(
-              new ErrorHandler(
-                "Error checking email uniqueness during update",
-                500
-              )
-            );
-          }
-        },
-      },
+      // hooks: {
+      //   // Hook to ensure email uniqueness before updates
+      //   beforeUpdate: async (user, options) => {
+      //     try {
+      //       // Ensure the email is unique when it's updated (excluding the current user)
+      //       const existingUserWithEmail = await sequelize.models.User.findOne({
+      //         where: { email: user.email, id: { [Sequelize.Op.ne]: user.id } },
+      //       });
+      //       if (existingUserWithEmail) {
+      //         return next(new ErrorHandler("Email is already in use.", 409)); // Use next() to pass error
+      //       }
+      //     } catch (error) {
+      //       return next(
+      //         new ErrorHandler(
+      //           "Error checking email uniqueness during update",
+      //           500
+      //         )
+      //       );
+      //     }
+      //   },
+      // },
     }
   );
   return User;

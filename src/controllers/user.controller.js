@@ -3,8 +3,11 @@ const dotenv = require("dotenv");
 const { generateToken } = require("../utilities/commonFunctions");
 const ErrorHandler = require("../utilities/ErrorHandler");
 const { encryptToken } = require("../utilities/cryptographySecurity");
+const { handleSession } = require("../services/dbCommonFunction");
+const { db } = require("../config/db");
 
 dotenv.config();
+const Session = db.Session;
 
 // Controller for User Registration
 const createUser = async (req, res, next) => {
@@ -23,8 +26,6 @@ const createUser = async (req, res, next) => {
       // If no user is returned, it means an error was passed to `next`
       return; // Stop execution
     }
-    // If user creation is successful, generate JWT token
-    const token = encryptToken(await generateToken(user));
 
     res.status(201).json({
       success: true,
@@ -42,15 +43,20 @@ const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      throw new Error("Email and password are required.");
+      throw new ErrorHandler("Email and password are required.", 400);
     }
 
-    const user = await userService.loginUser(email, password);
-
-    // Generate JWT token
-    const token = generateToken(user);
-
-    res.status(200).json({ message: "Login successful.", token });
+    const user = await userService.loginUser(email, password, next);
+    // If user creation is successful, generate JWT token
+    const tokenObj = await generateToken(user);
+    const accessToken = encryptToken(tokenObj.accessToken);
+    const refreshToken = encryptToken(tokenObj.refreshToken);
+    await handleSession(user.id, refreshToken, Session);
+    res.status(200).json({
+      message: "Login successful.",
+      token: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     next(error);
   }

@@ -22,6 +22,7 @@ const authMiddleware = async (req, res, next) => {
 
     const decryptedToken = await decryptToken(token);
     const payload = jwt.verify(decryptedToken, JWT_SECRET);
+    console.log(payload);
     req.user = payload;
     next();
   } catch (error) {

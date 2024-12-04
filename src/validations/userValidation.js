@@ -23,23 +23,21 @@ const createUserSchema = Joi.object({
   }),
 });
 
-const updateUserSchema = Joi.object({
-  name: Joi.string().min(3).max(30),
-  email: Joi.string().email(),
-  password: Joi.string().min(6),
-}).or("name", "email", "password"); // At least one field is required
-
-const getUserSchema = Joi.object({
-  id: Joi.number().integer().required(),
-});
-
-const deleteUserSchema = Joi.object({
-  id: Joi.number().integer().required(),
+const loginUserSchema = Joi.object({
+  email: Joi.string().email().required().empty().messages({
+    "string.base": "Email must be a string.",
+    "string.email": "Please provide a valid email address.",
+    "string.empty": "Email cannot be an empty string.",
+    "any.required": "Invalid credentials.",
+  }),
+  password: Joi.string().min(6).required().messages({
+    "string.base": "Password must be a string.",
+    "string.min": "Password must be at least 6 characters long.",
+    "any.required": "Invalid credentials.",
+  }),
 });
 
 module.exports = {
   createUserSchema,
-  updateUserSchema,
-  getUserSchema,
-  deleteUserSchema,
+  loginUserSchema,
 };

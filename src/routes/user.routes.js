@@ -1,6 +1,9 @@
 const express = require("express");
-const { createUser } = require("../controllers/user.controller");
-const { createUserSchema } = require("../validations/userValidation");
+const { createUser, loginUser } = require("../controllers/user.controller");
+const {
+  createUserSchema,
+  loginUserSchema,
+} = require("../validations/userValidation");
 const validationMiddleware = require("../middlewares/validationMiddleware");
 const authMiddleware = require("../middlewares/authMiddleware");
 
@@ -13,6 +16,7 @@ userRouter
       message: "This is all user",
     });
   })
-  .post("/register", validationMiddleware(createUserSchema), createUser);
+  .post("/register", validationMiddleware(createUserSchema), createUser)
+  .post("/login", validationMiddleware(loginUserSchema), loginUser);
 
 module.exports = userRouter;

@@ -36,7 +36,7 @@ const createUser = async (userData, next) => {
     while (!isUnique) {
       uniqueId = uuidv4();
       isUnique = await databaseUniqueIdExistFn(User, uniqueId, next);
-      console.log("isUnique", isUnique);
+      // console.log("isUnique", isUnique);
     }
 
     const data = {
@@ -55,19 +55,27 @@ const createUser = async (userData, next) => {
 };
 
 // Service to login a user (validate email and password)
-const loginUser = async (email, password) => {
-  const user = await User.findOne({ where: { email } });
+const loginUser = async (email, password, next) => {
+  try {
+    const existData = {
+      where: { email },
+    };
 
-  if (!user) {
-    throw new Error("User not found.");
+    // Check if email already exists
+    const user = await databaseExistFn(User, existData, next);
+    if (!user) {
+      return next(new ErrorHandler("User not found.", 404));
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      // throw new Error("Invalid credentials.");
+      return next(new ErrorHandler("Invalid credentials.", 401));
+    }
+    return user;
+  } catch (error) {
+    console.error("Error in createUser:", error);
+    return next(new ErrorHandler("Internal server error.", 500));
   }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new Error("Invalid credentials.");
-  }
-
-  return user;
 };
 
 // Service to get user profile

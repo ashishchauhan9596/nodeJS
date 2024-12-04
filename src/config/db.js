@@ -31,6 +31,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.User = require("../models/user.model")(sequelize, Sequelize);
+db.Session = require("../models/session.model")(sequelize);
 
 // Test database connection
 const testDatabaseConnection = async () => {
